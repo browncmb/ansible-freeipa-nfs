@@ -1,0 +1,16 @@
+---
+# IPA server configuration
+ipaserver_domain: example.test
+ipaserver_realm: EXAMPLE.TEST
+ipaserver_ip: 192.168.1.163
+ipaserver_setup_dns: true
+ipaserver_auto_forwarders: true
+ipaserver_no_dnssec_validation: true
+
+# IPA credentials required by freeipa.ansible_freeipa
+ipadm_password: "{{ vault_ipaserver_dir_manager_password }}"
+ipaadmin_password: "{{ vault_ipaserver_admin_password }}"
+
+# NFS configuration
+nfs_export_dir: /home
+nfs_server_ip: 192.168.1.163
