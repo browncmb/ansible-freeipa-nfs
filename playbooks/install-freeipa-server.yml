@@ -1,0 +1,9 @@
+---
+- name: Install and configure FreeIPA server
+  hosts: ipaserver
+  become: true
+  vars_files:
+    - ../vars/vault.yml
+  roles:
+    - role: freeipa.ansible_freeipa.ipaserver
+      state: present
