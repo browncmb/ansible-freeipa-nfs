@@ -1,0 +1,11 @@
+---
+ipa_users:
+  - username: nwright
+    first: Naomi
+    last: Wright
+    password: "{{ vault_default_user_password }}"
+
+  - username: kellis
+    first: Kai
+    last: Ellis
+    password: "{{ vault_default_user_password }}"
