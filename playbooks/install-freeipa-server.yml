@@ -1,6 +1,6 @@
 ---
 - name: Install and configure FreeIPA server
-  hosts: ipaserver
+  hosts: ipaservers
   become: true
   vars_files:
     - ../vars/vault.yml
