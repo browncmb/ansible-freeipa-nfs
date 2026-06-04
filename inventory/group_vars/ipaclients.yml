@@ -2,4 +2,5 @@
 # IPA client configuration
 ipaclient_domain: "{{ ipaserver_domain }}"
 ipaclient_realm: "{{ ipaserver_realm }}"
-ipaclient_admin_password: "{{ ipaserver_admin_password }}"
+ipaadmin_password: "{{ vault_ipaserver_admin_password }}"
+ipaclient_mkhomedir: true

@@ -1,0 +1,16 @@
+---
+- name: Enroll FreeIPA clients
+  hosts: ipaclients
+  become: true
+  vars_files:
+    - ../vars/vault.yml
+  
+  pre_tasks:
+    - name: Install realmd for realm verification
+      ansible.builtin.dnf:
+        name: realmd
+        state: present
+  
+  roles:
+    - role: freeipa.ansible_freeipa.ipaclient
+      state: present
