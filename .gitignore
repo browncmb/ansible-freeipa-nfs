@@ -1,2 +1,6 @@
 # Installed Ansible collections
 collections/
+
+# Ansible/runtime artifacts
+*.retry
+*.swp
