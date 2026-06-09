@@ -236,10 +236,7 @@ Roaming home directory validation confirmed:
 * Test files persist across client logins for the same user
 * NFS exports, autofs, SELinux, and file ownership work together successfully
 
-Detailed validation results are documented here:
-
-```text
-docs/roaming-home-directory-validation.md
+Detailed validation results are documented in [roaming-home-directory-validation.md](docs/roaming-home-directory-validation.md).
 
 ## Skills Demonstrated
 
