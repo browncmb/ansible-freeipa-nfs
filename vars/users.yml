@@ -4,8 +4,12 @@ ipa_users:
     first: Naomi
     last: Wright
     password: "{{ vault_default_user_password }}"
+    homedirectory: "/net/client01.{{ ipaserver_domain }}/home/nwright"
+    home_host: "client01.{{ ipaserver_domain }}"
 
   - username: kellis
     first: Kai
     last: Ellis
     password: "{{ vault_default_user_password }}"
+    homedirectory: "/net/client03.{{ ipaserver_domain }}/home/kellis"
+    home_host: "client03.{{ ipaserver_domain }}"

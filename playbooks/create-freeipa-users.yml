@@ -13,11 +13,28 @@
     - name: Create FreeIPA users
       freeipa.ansible_freeipa.ipauser:
         ipaadmin_password: "{{ vault_ipaserver_admin_password }}"
-        name: "{{ item.username }}"
-        first: "{{ item.first }}"
-        last: "{{ item.last }}"
-        password: "{{ item.password }}"
+        name: "{{ ipa_user.username }}"
+        first: "{{ ipa_user.first }}"
+        last: "{{ ipa_user.last }}"
+        password: "{{ ipa_user.password }}"
+        homedir: "{{ ipa_user.homedirectory }}"
         update_password: on_create
         state: present
       loop: "{{ ipa_users }}"
+      loop_control:
+        loop_var: ipa_user
+        label: "{{ ipa_user.username }}"
       no_log: true
+
+    - name: Create home directory on designated host
+      ansible.builtin.file:
+        path: "/home/{{ ipa_user.username }}"
+        state: directory
+        owner: "{{ ipa_user.username }}"
+        group: "{{ ipa_user.username }}"
+        mode: '0700'
+      delegate_to: "{{ ipa_user.home_host }}"
+      loop: "{{ ipa_users }}"
+      loop_control:
+        loop_var: ipa_user
+        label: "{{ ipa_user.username }}"
