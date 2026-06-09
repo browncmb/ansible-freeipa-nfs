@@ -1,2 +1,3 @@
 ---
 # vars file for roles/nfs_server
+nfs_server_export_homedir: "/home *.{{ ipaserver_domain }}(rw,no_root_squash,no_subtree_check)"

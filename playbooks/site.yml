@@ -1,0 +1,8 @@
+---
+- name: Configure NFS exports and autofs
+  hosts: ipaclients
+  become: true
+
+  roles:
+    - role: nfs_server
+      tags: nfs

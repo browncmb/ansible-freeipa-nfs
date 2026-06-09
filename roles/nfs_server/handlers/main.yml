@@ -1,2 +1,11 @@
 ---
 # handlers file for roles/nfs_server
+#
+- name: Export file
+  ansible.builtin.command:
+    cmd: exportfs -ra
+
+- name: Restart autofs service
+  ansible.builtin.service:
+    name: autofs
+    state: restarted
