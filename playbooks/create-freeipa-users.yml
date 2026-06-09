@@ -25,6 +25,9 @@
         loop_var: ipa_user
         label: "{{ ipa_user.username }}"
       no_log: true
+      tags:
+        - users
+        - ipa_users
 
     - name: Create home directory on designated host
       ansible.builtin.file:
@@ -38,3 +41,6 @@
       loop_control:
         loop_var: ipa_user
         label: "{{ ipa_user.username }}"
+      tags:
+        - users
+        - home_dirs
