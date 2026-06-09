@@ -1,4 +1,10 @@
 ---
+- name: Deploy FreeIPA server
+  import_playbook: install-freeipa-server.yml
+
+- name: Enroll FreeIPA clients
+  import_playbook: enroll-freeipa-clients.yml
+
 - name: Configure NFS exports and autofs
   hosts: ipaclients
   become: true
@@ -6,3 +12,6 @@
   roles:
     - role: nfs_server
       tags: nfs
+
+- name: Create FreeIPA users and home directories
+  import_playbook: create-freeipa-users.yml
