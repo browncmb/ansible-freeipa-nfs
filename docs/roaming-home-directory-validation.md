@@ -1,17 +1,17 @@
 # Roaming Home Directory Validation
 
-This document validates that FreeIPA users can log in from multiple client systems and access the same NFS-backed home directory through autofs.
+This document validates that FreeIPA users can log in from multiple enrolled client systems and access their assigned NFS-backed home directory through autofs.
 
 ## User Home Directory Mapping
 
-| User | Home Host | FreeIPA Home Directory |
-|---|---|---|
+| User    | Assigned Home Host    | FreeIPA Home Directory                  |
+| ------- | --------------------- | --------------------------------------- |
 | nwright | client01.example.test | /net/client01.example.test/home/nwright |
-| kellis | client03.example.test | /net/client03.example.test/home/kellis |
+| kellis  | client03.example.test | /net/client03.example.test/home/kellis  |
 
 ## Physical Home Directory Validation
 
-Validated that each user’s physical home directory exists on the assigned home host with the expected ownership.
+Validated that each user's physical home directory exists on the assigned home host with the expected ownership.
 
 ### Validation commands
 
@@ -29,7 +29,7 @@ ansible client03.example.test -m command -a "ls -ld /home/kellis" -b
 
 ## autofs Path Resolution Validation
 
-Validated that each roaming home directory path resolves from all FreeIPA client systems through the `/net` autofs map.
+Validated that each assigned roaming home directory path resolves from all FreeIPA client systems through the `/net` autofs map.
 
 ### Validation commands
 
@@ -47,7 +47,7 @@ ansible ipaclients -m command -a "ls -ld /net/client03.example.test/home/kellis"
 
 ## Cross-Client File Persistence Validation
 
-Validated that files created in a user’s roaming home directory remain available when the same user logs in from another client.
+Validated that files created in a user's assigned roaming home directory remain available when the same user logs in from another client.
 
 ### nwright
 
@@ -111,4 +111,4 @@ kellis-test.txt contained: Hello from client03 as kellis
 
 Validation passed.
 
-FreeIPA authentication, NFS `/home` exports, autofs `/net` path resolution, file ownership, and cross-client roaming home directory access were verified successfully.
+FreeIPA authentication, assigned NFS home hosts, NFS `/home` exports, autofs `/net` path resolution, file ownership, and cross-client roaming home directory access were verified successfully.

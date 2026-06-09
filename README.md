@@ -4,9 +4,9 @@ Ansible automation for deploying a RHEL-based FreeIPA identity environment with 
 
 ## Overview
 
-This project builds a Linux identity management lab using Ansible, FreeIPA, NFS, and autofs. The automation deploys a FreeIPA server, enrolls client systems, provisions FreeIPA users, configures client-based NFS home exports, and validates that users can access the same roaming home directory from multiple client machines.
+This project builds a Linux identity management lab using Ansible, FreeIPA, NFS, and autofs. The automation deploys a FreeIPA server, enrolls client systems, provisions FreeIPA users, configures per-user NFS home host assignments, and validates that users can access the same assigned home directory from multiple client machines.
 
-The goal is to demonstrate repeatable Linux infrastructure automation with a focus on identity management, centralized authentication, NFS home directory access, autofs path resolution, and role-based Ansible design.
+The goal is to demonstrate repeatable Linux infrastructure automation with a focus on identity management, centralized authentication, NFS-backed home directory access, autofs `/net` path resolution, and role-based Ansible design.
 
 ## Architecture
 
@@ -28,8 +28,9 @@ The goal is to demonstrate repeatable Linux infrastructure automation with a foc
 | - FreeIPA server            |              | client03.example.test            |
 | - Kerberos/KDC              |              |                                  |
 | - LDAP identity backend     |              | - FreeIPA client enrollment      |
-| - DNS/identity services     |              | - NFS /home exports              |
-+-----------------------------+              | - autofs /net path resolution    |
+| - DNS/identity services     |              | - Designated NFS home hosts      |
++-----------------------------+              | - NFS /home exports              |
+                                             | - autofs /net path resolution    |
                                              | - roaming home directory access  |
                                              +----------------------------------+
 ```
@@ -84,7 +85,7 @@ The goal is to demonstrate repeatable Linux infrastructure automation with a foc
 
 ## Inventory Design
 
-The lab uses one FreeIPA server and three FreeIPA client systems.
+The lab uses one FreeIPA server and three FreeIPA client systems. The client systems also act as designated NFS home hosts for assigned users.
 
 ```ini
 [ipaservers]
@@ -95,12 +96,15 @@ client01.example.test
 client02.example.test
 client03.example.test
 
+[nfsservers:children]
+ipaclients
+
 [lab:children]
 ipaservers
 ipaclients
 ```
 
-The FreeIPA clients are configured with NFS and autofs to support roaming home directory access through `/net` paths.
+The `ipaclients` group contains the FreeIPA-enrolled client systems. The `nfsservers` group targets those same client systems when applying the NFS/autofs home directory role.
 
 ## What This Automation Builds
 
@@ -110,8 +114,9 @@ The automation performs the following:
 * Enrolls RHEL client systems into the FreeIPA domain
 * Provisions FreeIPA users with Vault-backed temporary passwords
 * Configures FreeIPA user `homedir` attributes
-* Creates physical home directories on assigned client systems
-* Configures client-based NFS `/home` exports
+* Assigns each user to a designated NFS home host
+* Creates physical home directories on the assigned home hosts
+* Configures NFS `/home` exports on the designated home hosts
 * Configures autofs with the `/net -hosts` map
 * Sets the SELinux boolean required for NFS-backed home directories
 * Opens required firewall services for NFS traffic
@@ -120,14 +125,14 @@ The automation performs the following:
 
 ## User Home Directory Design
 
-Each FreeIPA user is assigned a roaming home directory path that resolves through autofs.
+Each FreeIPA user is assigned a designated NFS home host. The user’s FreeIPA `homedir` attribute points to a `/net/HOSTNAME/home/USERNAME` path, allowing the user to log into any enrolled client and access the same NFS-backed home directory through autofs.
 
-| User    | Home Host             | FreeIPA Home Directory                  |
-| ------- | --------------------- | --------------------------------------- |
-| nwright | client01.example.test | /net/client01.example.test/home/nwright |
-| kellis  | client03.example.test | /net/client03.example.test/home/kellis  |
+| User    | Assigned NFS Home Host | FreeIPA Home Directory                  |
+| ------- | ---------------------- | --------------------------------------- |
+| nwright | client01.example.test  | /net/client01.example.test/home/nwright |
+| kellis  | client03.example.test  | /net/client03.example.test/home/kellis  |
 
-The physical directories are created on the assigned client systems:
+The physical directories are created on the assigned home hosts:
 
 ```text
 /home/nwright -> client01.example.test
@@ -147,7 +152,7 @@ This project uses wrapper playbooks to keep the automation modular and easier to
 | `create-freeipa-users.yml`   | Creates FreeIPA users and home directories |
 | `site.yml`                   | Runs the full end-to-end workflow          |
 
-The `nfs_server` role manages NFS and autofs configuration through a reusable Ansible role structure.
+The `nfs_server` role manages the NFS and autofs configuration needed for assigned home hosts and `/net` path resolution.
 
 Key role functions include:
 
@@ -222,7 +227,7 @@ ansible-playbook playbooks/site.yml --vault-password-file ~/ansible-secrets/free
 ### Run only the NFS/autofs configuration
 
 ```bash
-ansible-playbook playbooks/site.yml --tags nfs --limit ipaclients --vault-password-file ~/ansible-secrets/freeipa-nfs-vault-pass.txt
+ansible-playbook playbooks/site.yml --tags nfs --limit nfsservers --vault-password-file ~/ansible-secrets/freeipa-nfs-vault-pass.txt
 ```
 
 ## Validation
@@ -257,5 +262,4 @@ This project demonstrates:
 
 ## Result
 
-This project provides a repeatable Ansible workflow for deploying a FreeIPA-based Linux identity lab with NFS/autofs-based roaming home directories. The final workflow ties together identity management, client enrollment, home directory provisioning, NFS exports, autofs resolution, and end-to-end validation.
-
+This project provides a repeatable Ansible workflow for deploying a FreeIPA-based Linux identity lab with per-user NFS home host assignments and autofs-based roaming home directory access. The final workflow ties together identity management, client enrollment, home directory provisioning, NFS exports, autofs resolution, and end-to-end validation.
