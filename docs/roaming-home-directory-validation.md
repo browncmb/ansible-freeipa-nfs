@@ -4,21 +4,23 @@ This document validates that FreeIPA users can log in from multiple client syste
 
 ## User Home Directory Mapping
 
-| User    | Home Host             | FreeIPA Home Directory                  |
-| ------- | --------------------- | --------------------------------------- |
+| User | Home Host | FreeIPA Home Directory |
+|---|---|---|
 | nwright | client01.example.test | /net/client01.example.test/home/nwright |
-| kellis  | client03.example.test | /net/client03.example.test/home/kellis  |
+| kellis | client03.example.test | /net/client03.example.test/home/kellis |
 
 ## Physical Home Directory Validation
 
-Verified that each user’s physical home directory exists on the assigned home host with matching ownership.
+Validated that each user’s physical home directory exists on the assigned home host with the expected ownership.
+
+### Validation commands
 
 ```bash
 ansible client01.example.test -m command -a "ls -ld /home/nwright" -b
 ansible client03.example.test -m command -a "ls -ld /home/kellis" -b
 ```
 
-Validation result:
+### Observed result
 
 ```text
 /home/nwright exists on client01.example.test and is owned by nwright:nwright
@@ -27,23 +29,25 @@ Validation result:
 
 ## autofs Path Resolution Validation
 
-Verified that each roaming home directory path resolves from all FreeIPA client systems through the /net autofs map.
+Validated that each roaming home directory path resolves from all FreeIPA client systems through the `/net` autofs map.
+
+### Validation commands
 
 ```bash
 ansible ipaclients -m command -a "ls -ld /net/client01.example.test/home/nwright" -b
 ansible ipaclients -m command -a "ls -ld /net/client03.example.test/home/kellis" -b
 ```
 
-Validation result:
+### Observed result
 
 ```text
 /net/client01.example.test/home/nwright resolves from client01, client02, and client03
 /net/client03.example.test/home/kellis resolves from client01, client02, and client03
 ```
 
-## File Persistence Validation
+## Cross-Client File Persistence Validation
 
-Verified that files created in a user’s roaming home directory remain available when the same user logs in from another client.
+Validated that files created in a user’s roaming home directory remain available when the same user logs in from another client.
 
 ### nwright
 
@@ -66,11 +70,11 @@ cat ~/nwright-test.txt
 exit
 ```
 
-Validation result:
+### Observed result
 
 ```text
 pwd resolved to /net/client01.example.test/home/nwright
-nwright-test.txt was present from the second client login
+nwright-test.txt was available from the second client login
 nwright-test.txt contained: Hello from client01 as nwright
 ```
 
@@ -95,11 +99,11 @@ cat ~/kellis-test.txt
 exit
 ```
 
-Validation result:
+### Observed result
 
 ```text
 pwd resolved to /net/client03.example.test/home/kellis
-kellis-test.txt was present from the second client login
+kellis-test.txt was available from the second client login
 kellis-test.txt contained: Hello from client03 as kellis
 ```
 
@@ -107,5 +111,4 @@ kellis-test.txt contained: Hello from client03 as kellis
 
 Validation passed.
 
-FreeIPA authentication, NFS home exports, autofs /net path resolution, file ownership, and cross-client roaming home directory access were verified successfully.
-
+FreeIPA authentication, NFS `/home` exports, autofs `/net` path resolution, file ownership, and cross-client roaming home directory access were verified successfully.
